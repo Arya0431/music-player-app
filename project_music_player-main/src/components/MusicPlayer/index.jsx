@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-
-import { nextSong, prevSong, playPause } from '../../redux/features/playerSlice';
-import Controls from './Controls';
-import Player from './Player';
-import Seekbar from './Seekbar';
-import Track from './Track';
-import VolumeBar from './VolumeBar';
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  nextSong,
+  prevSong,
+  playPause,
+} from "../../redux/features/playerSlice";
+import Controls from "./Controls";
+import Player from "./Player";
+import Seekbar from "./Seekbar";
+import Track from "./Track";
+import VolumeBar from "./VolumeBar";
 
 const MusicPlayer = () => {
-  const { activeSong, currentSongs, currentIndex, isActive, isPlaying } = useSelector((state) => state.player);
+  const { activeSong, currentSongs, currentIndex, isActive, isPlaying } =
+    useSelector((state) => state.player);
   const [duration, setDuration] = useState(0);
   const [seekTime, setSeekTime] = useState(0);
   const [appTime, setAppTime] = useState(0);
@@ -24,7 +28,6 @@ const MusicPlayer = () => {
 
   const handlePlayPause = () => {
     if (!isActive) return;
-
     if (isPlaying) {
       dispatch(playPause(false));
     } else {
@@ -34,7 +37,6 @@ const MusicPlayer = () => {
 
   const handleNextSong = () => {
     dispatch(playPause(false));
-
     if (!shuffle) {
       dispatch(nextSong((currentIndex + 1) % currentSongs.length));
     } else {
@@ -52,10 +54,31 @@ const MusicPlayer = () => {
     }
   };
 
+  if (!activeSong?.title && !activeSong?.trackName) return null;
+
+  // iTunes fallback fields
+  const image = activeSong.artworkUrl100 || activeSong.images?.coverart;
+  const title = activeSong.trackName || activeSong.title;
+  const subtitle = activeSong.artistName || activeSong.subtitle;
+
   return (
-    <div className="relative sm:px-12 px-8 w-full flex items-center justify-between">
-      <Track isPlaying={isPlaying} isActive={isActive} activeSong={activeSong} />
-      <div className="flex-1 flex flex-col items-center justify-center">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#181818] border-t border-gray-800 flex items-center justify-between px-6 py-3 shadow-2xl">
+      <div className="flex items-center min-w-[200px]">
+        <img
+          src={image}
+          alt="cover"
+          className="w-16 h-16 rounded-lg shadow-md mr-4"
+        />
+        <div>
+          <p className="text-white font-bold text-base truncate max-w-[180px]">
+            {title}
+          </p>
+          <p className="text-gray-400 text-sm truncate max-w-[180px]">
+            {subtitle}
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-col items-center flex-1">
         <Controls
           isPlaying={isPlaying}
           isActive={isActive}
@@ -88,7 +111,15 @@ const MusicPlayer = () => {
           onLoadedData={(event) => setDuration(event.target.duration)}
         />
       </div>
-      <VolumeBar value={volume} min="0" max="1" onChange={(event) => setVolume(event.target.value)} setVolume={setVolume} />
+      <div className="flex items-center min-w-[200px] justify-end">
+        <VolumeBar
+          value={volume}
+          min="0"
+          max="1"
+          onChange={(event) => setVolume(event.target.value)}
+          setVolume={setVolume}
+        />
+      </div>
     </div>
   );
 };

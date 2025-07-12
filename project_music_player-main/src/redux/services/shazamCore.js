@@ -69,3 +69,5 @@ export const {
   useGetSongDetailsQuery,
   useGetSongRelatedQuery,
 } = shazamCoreApi;
+
+console.log("Loaded API Key:", import.meta.env.VITE_SHAZAM_CORE_RAPID_API_KEY);
